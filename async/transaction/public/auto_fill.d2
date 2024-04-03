@@ -1,0 +1,51 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+    theme-id: 5
+  }
+}
+
+auto_fill: {
+  # imports
+  get_network_id_and_build_version: @../private/get_network_id_and_build_version.get_network_id_and_build_version
+  txn_needs_network_id: @../private/txn_needs_network_id.txn_needs_network_id
+
+  start: {
+    shape: oval
+  }
+  end: {
+    shape: oval
+  }
+  client_net_id_determine: determine if client has network id set {
+    shape: rectangle
+  }
+  client_net_id_decide: has client network id set? {
+    shape: diamond
+  }
+  txn_net_id_determine: determine if txn has network id set {
+    shape: rectangle
+  }
+  txn_net_id_decide: is network id in txn json? {
+    shape: diamond
+  }
+  txn_needs_net_id_decide: does txn need network id? {
+    shape: diamond
+  }
+  set_net_id_from_client: set the network id received from client {
+    shape: rectangle
+  }
+  txn_sequence_determine: determine if txn has sequence number {
+    shape: rectangle
+  }
+
+  start -> client_net_id_determine
+  client_net_id_determine -> client_net_id_decide
+  client_net_id_decide -> get_network_id_and_build_version: no
+  client_net_id_decide -> txn_net_id_determine: yes
+  txn_net_id_determine -> txn_net_id_decide
+  txn_net_id_decide -> txn_needs_network_id: no
+  txn_net_id_decide -> txn_sequence_determine: yes
+  txn_needs_network_id -> txn_needs_net_id_decide
+  txn_needs_net_id_decide -> txn_sequence_determine: no
+  txn_needs_net_id_decide -> set_net_id_from_client: yes
+}
